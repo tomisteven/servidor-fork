@@ -9,22 +9,15 @@ const {
 
 const cookieParser = require("cookie-parser");
 
-
-
 const sistema = require("./Routes/sistema.route");
 const paciente = require("./Routes/Paciente.router");
-const doctores = require("./Routes/Doctor.router");
+const doctores = require("./Routes/doctor.router");
 const secretaria = require("./Routes/Secretaria.router");
 
 const app = express();
 const dotenv = require("dotenv");
 
 dotenv.config();
-//configurar S3
-
-
-
-
 
 // Settings
 app.use(bodyParser.urlencoded({ extended: false }));

@@ -5,7 +5,14 @@ const Doctor = require("../models/Doctor");
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    const validEmail = email.includes("@");
+    if (!validEmail) {
+      return res.status(400).json({ message: "Email invalido", ok: false });
+    }
+
     const secretaria = await Secretaria.findOne({ email });
+
     if (secretaria && secretaria.password === password) {
       return res.json({
         message: "Secretaria logueada",

@@ -94,9 +94,8 @@ const subirDocumentoAPaciente = async (req, res) => {
       Key: originalFilename, // Usamos el nombre limpio
       Body: fileBuffer,
       ContentType: file.type || "application/octet-stream",
-      ACL: "public-read" // 🔹 ESTO HACE QUE EL ARCHIVO SEA PÚBLICO AUTOMÁTICAMENTE
+      ACL: "public-read", // 🔹 ESTO HACE QUE EL ARCHIVO SEA PÚBLICO AUTOMÁTICAMENTE
     };
-
 
     try {
       const subida = await s3.send(new PutObjectCommand(params));
@@ -157,6 +156,15 @@ const obtenerUrlDescarga = async (req, res) => {
   }
 };
 
+const updateSecretaria = async (req, res) => {
+  try {
+    await Secretaria.findByIdAndUpdate(req.params.id, req.body);
+    res.json({ message: "Secretaria actualizada", ok: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message, ok: false });
+  }
+};
+
 module.exports = {
   getSecretarias,
   crearSecretaria,
@@ -164,4 +172,5 @@ module.exports = {
   eliminarSecretaria,
   subirDocumentoAPaciente,
   obtenerUrlDescarga,
+  updateSecretaria,
 };

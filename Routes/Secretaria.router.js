@@ -12,10 +12,12 @@ const {
   eliminarSecretaria,
   subirDocumentoAPaciente,
   obtenerUrlDescarga,
+  updateSecretaria,
 } = require("../controllers/Secretaria.controller.js");
 
 const router = Router();
 
+router.patch("/secretaria/:id", asureAuth, updateSecretaria);
 router.get("/secretarias", asureAuth, getSecretarias);
 router.post("/secretaria", asureAuth, crearSecretaria);
 router.get("/secretaria/:id", asureAuth, verSecretaria);

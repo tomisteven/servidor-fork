@@ -4,15 +4,13 @@ const Doctor = require("../models/Doctor");
 const getDoctores = async (req, res) => {
   try {
     const doctores = await Doctor.find();
-    res.status(200).json({ ok: true, data: doctores });
+    res.status(200).json(doctores);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        ok: false,
-        message: "Error al obtener los doctores",
-        error: error.message,
-      });
+    res.status(500).json({
+      ok: false,
+      message: "Error al obtener los doctores",
+      error: error.message,
+    });
   }
 };
 
@@ -35,17 +33,17 @@ const crearDoctor = async (req, res) => {
 
     const doctor = new Doctor(req.body);
     await doctor.save();
-    res
-      .status(201)
-      .json({ ok: true, message: "Doctor creado exitosamente", data: doctor });
+    res.status(201).json({
+      ok: true,
+      message: "Doctor creado exitosamente",
+      doctor: doctor,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        ok: false,
-        message: "Error al crear el doctor",
-        error: error.message,
-      });
+    res.status(500).json({
+      ok: false,
+      message: "Error al crear el doctor",
+      error: error.message,
+    });
   }
 };
 
@@ -58,15 +56,13 @@ const verDoctor = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Doctor no encontrado" });
     }
-    res.status(200).json({ ok: true, data: doctor });
+    res.status(200).json({ ok: true, doctor });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        ok: false,
-        message: "Error al obtener el doctor",
-        error: error.message,
-      });
+    res.status(500).json({
+      ok: false,
+      message: "Error al obtener el doctor",
+      error: error.message,
+    });
   }
 };
 
@@ -82,21 +78,17 @@ const updateDoctor = async (req, res) => {
         .status(404)
         .json({ ok: false, message: "Doctor no encontrado" });
     }
-    res
-      .status(200)
-      .json({
-        ok: true,
-        message: "Doctor actualizado exitosamente",
-        data: doctor,
-      });
+    res.status(200).json({
+      ok: true,
+      message: "Doctor actualizado exitosamente",
+      data: doctor,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        ok: false,
-        message: "Error al actualizar el doctor",
-        error: error.message,
-      });
+    res.status(500).json({
+      ok: false,
+      message: "Error al actualizar el doctor",
+      error: error.message,
+    });
   }
 };
 
@@ -113,13 +105,11 @@ const eliminarDoctor = async (req, res) => {
       .status(200)
       .json({ ok: true, message: "Doctor eliminado exitosamente" });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        ok: false,
-        message: "Error al eliminar el doctor",
-        error: error.message,
-      });
+    res.status(500).json({
+      ok: false,
+      message: "Error al eliminar el doctor",
+      error: error.message,
+    });
   }
 };
 

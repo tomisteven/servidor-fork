@@ -49,9 +49,9 @@ const createPaciente = async (req, res) => {
 const deletePaciente = async (req, res) => {
   try {
     await Paciente.findByIdAndDelete(req.params.id);
-    res.json({ message: "Paciente eliminado" });
+    res.json({ message: "Paciente eliminado", ok: true });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message, ok: false });
   }
 };
 

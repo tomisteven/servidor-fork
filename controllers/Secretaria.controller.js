@@ -47,9 +47,9 @@ const verSecretaria = async (req, res) => {
 const eliminarSecretaria = async (req, res) => {
   try {
     await Secretaria.findByIdAndDelete(req.params.id);
-    res.json({ message: "Secretaria eliminada" });
+    res.json({ message: "Secretaria eliminada", ok: true });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message, ok: false });
   }
 };
 

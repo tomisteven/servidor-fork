@@ -7,6 +7,7 @@ const {
   createPaciente,
   deletePaciente,
   updatePaciente,
+  getDocumentsGroupedByName
 } = require("../controllers/Paciente.controller.js");
 
 const app = Router();
@@ -19,5 +20,6 @@ app.post("/paciente", asureAuth, createPaciente);
 
 app.patch("/paciente/:id", asureAuth, updatePaciente);
 app.delete("/paciente/:id", asureAuth, deletePaciente);
+app.get("/paciente/:id/documentos", asureAuth, getDocumentsGroupedByName);
 
 module.exports = app;

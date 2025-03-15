@@ -55,10 +55,53 @@ const deletePaciente = async (req, res) => {
   }
 };
 
+async function getDocumentsGroupedByName(req, res) {
+  try {
+    // Obtener el ID del usuario desde los parámetros de la URL
+    const { id } = req.params;
+
+    // Buscar el usuario por ID en la base de datos
+    const user = await Paciente.findById(id);
+
+    // Verificar si el usuario existe
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Agrupar documentos por nombre de archivo
+    const documents = user.documentos.reduce((acc, documento) => {
+      // Verificar si ya existe un grupo para este nombre de archivo
+      const existingGroup = acc.find(
+        (group) => group.nombreArchivo === documento.nombreArchivo
+      );
+
+      if (existingGroup) {
+        // Si existe, agregar el documento al grupo
+        existingGroup.archivos.push(documento);
+      } else {
+        // Si no existe, crear un nuevo grupo
+        acc.push({
+          nombreArchivo: documento.nombreArchivo,
+          archivos: [documento],
+        });
+      }
+
+      return acc;
+    }, []);
+
+    // Devolver los documentos agrupados
+    return res.json(documents);
+  } catch (error) {
+    console.error("Error al obtener documentos:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+}
+
 module.exports = {
   getPacientes,
   getPaciente,
   createPaciente,
   deletePaciente,
   updatePaciente,
+  getDocumentsGroupedByName,
 };

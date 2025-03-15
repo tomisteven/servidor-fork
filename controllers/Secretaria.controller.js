@@ -68,65 +68,67 @@ const subirDocumentoAPaciente = async (req, res) => {
     const { nombreArchivo } = req.body;
     const paciente = await Paciente.findById(id);
 
+    console.log(req.files);
+
     if (!paciente) {
       return res.status(404).json({ message: "Paciente no encontrado" });
     }
 
-    if (!req.files || !req.files.dicom) {
+    if (!req.files || !req.files.dicoms || !Array.isArray(req.files.dicoms)) {
       return res
         .status(400)
-        .json({ message: "No se ha subido ningún archivo" });
+        .json({ message: "No se han subido archivos válidos" });
     }
 
-    const file = req.files.dicom; // Acceder correctamente al archivo
     const bucket = "dicom-medical";
-    const originalFilename = file.originalFilename
-      .toLowerCase()
-      .replace(/[^a-z0-9.-]/g, "-");
+    const archivosSubidos = [];
+    const fechaActual = new Date().toISOString().replace(/[:.]/g, "-");
 
-    const urlArchivo = `https://${bucket}.s3.${miRegion}.amazonaws.com/${originalFilename}`;
+    // Procesar todos los archivos
+    for (let i = 0; i < req.files.dicoms.length; i++) {
+      //console.log(req.files.dicoms[i]);
 
-    // Leer el archivo desde la ruta temporal
-    const fileBuffer = fs.readFileSync(file.path);
+      const file = req.files.dicoms[i];
+      const originalFilename = file.originalFilename
+        .toLowerCase()
+        .replace(/[^a-z0-9.-]/g, "-");
 
-    const params = {
-      Bucket: bucket,
-      Key: originalFilename, // Usamos el nombre limpio
-      Body: fileBuffer,
-      ContentType: file.type || "application/octet-stream",
-      ACL: "public-read", // 🔹 ESTO HACE QUE EL ARCHIVO SEA PÚBLICO AUTOMÁTICAMENTE
-    };
+      const urlArchivo = `https://${bucket}.s3.${miRegion}.amazonaws.com/${originalFilename}`;
+      const fileBuffer = fs.readFileSync(file.path);
 
-    try {
-      const subida = await s3.send(new PutObjectCommand(params));
+      const params = {
+        Bucket: bucket,
+        Key: originalFilename,
+        Body: fileBuffer,
+        ContentType: file.type || "application/octet-stream",
+        ACL: "public-read",
+      };
 
-      // Agregar documento al paciente
-      paciente.documentos.push({
-        urlArchivo,
-        idArchivo: subida.$metadata.requestId,
-        nombreArchivo,
-        originalFilename,
-      });
+      try {
+        const subida = await s3.send(new PutObjectCommand(params));
 
-      await paciente.save(); // Guardar en la base de datos
+        // Agregar documento al paciente
+        paciente.documentos.push({
+          urlArchivo,
+          idArchivo: subida.$metadata.requestId,
+          nombreArchivo,
+          originalFilename,
+        });
 
-      // Eliminar el archivo temporal
-      fs.unlinkSync(file.path);
-
-      res.json({
-        message: "Documento subido con éxito",
-        url: urlArchivo,
-        ok: true,
-        subida,
-      });
-    } catch (error) {
-      console.error("Error al subir a S3:", error);
-      res.status(500).json({
-        message: "Error al subir archivo a S3",
-        error: error.message,
-        ok: false,
-      });
+        archivosSubidos.push({ urlArchivo, originalFilename });
+        fs.unlinkSync(file.path); // Eliminar archivo temporal
+      } catch (error) {
+        console.error("Error al subir a S3:", error);
+      }
     }
+
+    await paciente.save(); // Guardar en la base de datos
+
+    res.json({
+      message: "Documentos subidos con éxito",
+      archivosSubidos,
+      ok: true,
+    });
   } catch (error) {
     console.error("Error en la solicitud:", error);
     res

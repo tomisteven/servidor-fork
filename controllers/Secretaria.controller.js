@@ -64,11 +64,13 @@ let s3 = new S3Client({
 
 const subirDocumentoAPaciente = async (req, res) => {
   try {
+    const imagemin = (await import("imagemin")).default;
+    const imageminMozjpeg = (await import("imagemin-mozjpeg")).default;
+    const imageminPngquant = (await import("imagemin-pngquant")).default;
+    const imageminWebp = (await import("imagemin-webp")).default;
     const { id } = req.params;
     const { nombreArchivo } = req.body;
     const paciente = await Paciente.findById(id);
-
-    console.log(req.files);
 
     if (!paciente) {
       return res.status(404).json({ message: "Paciente no encontrado" });
@@ -96,14 +98,24 @@ const subirDocumentoAPaciente = async (req, res) => {
 
       const urlArchivo = `https://${bucket}.s3.${miRegion}.amazonaws.com/${originalFilename}`;
 
-      // console.log(`Procesando archivo: ${file.path}`);
+      console.log("Archivo No comprimido", file.size);
 
+      // Leer archivo y optimizarlo
       const fileBuffer = await fs.promises.readFile(file.path);
+      const bufferOptimizado = await imagemin.buffer(fileBuffer, {
+        plugins: [
+          imageminMozjpeg({ quality: 75 }), // Comprime JPEG
+          imageminPngquant({ quality: [0.6, 0.8] }), // Comprime PNG
+          imageminWebp({ quality: 75 }), // Comprime WebP
+        ],
+      });
+
+      console.log("Archivo comprimido", bufferOptimizado.length);
 
       const params = {
         Bucket: bucket,
         Key: originalFilename,
-        Body: fileBuffer,
+        Body: bufferOptimizado,
         ContentType: file.type || "application/octet-stream",
         ACL: "public-read",
       };
@@ -130,7 +142,7 @@ const subirDocumentoAPaciente = async (req, res) => {
     await paciente.save();
 
     res.json({
-      message: "Documentos subidos con éxito",
+      message: "Documentos optimizados y subidos con éxito",
       archivosSubidos,
       ok: true,
     });

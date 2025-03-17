@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const DoctorSchema = new Schema({
   nombre: { type: String, required: true },
+  especialidad: String,
   usuario: String,
   email: String,
   password: {

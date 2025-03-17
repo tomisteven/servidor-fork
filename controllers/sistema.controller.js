@@ -2,6 +2,8 @@ const Paciente = require("../models/Paciente");
 const Secretaria = require("../models/Secretaria");
 const Doctor = require("../models/Doctor");
 
+
+
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;

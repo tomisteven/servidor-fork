@@ -2,18 +2,11 @@ const Paciente = require("../models/Paciente");
 const Secretaria = require("../models/Secretaria");
 const Doctor = require("../models/Doctor");
 
-
-
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { usuario, password } = req.body;
 
-    const validEmail = email.includes("@");
-    if (!validEmail) {
-      return res.status(400).json({ message: "Email invalido", ok: false });
-    }
-
-    const secretaria = await Secretaria.findOne({ email });
+    const secretaria = await Secretaria.findOne({ usuario });
 
     if (secretaria && secretaria.password === password) {
       return res.json({
@@ -23,7 +16,7 @@ const login = async (req, res) => {
         rol: "secretaria",
       });
     } else {
-      const doctor = await Doctor.findOne({ email });
+      const doctor = await Doctor.findOne({ usuario });
       if (doctor && doctor.password === password) {
         return res.json({
           message: "Doctor logueado",
@@ -32,7 +25,9 @@ const login = async (req, res) => {
           rol: "doctor",
         });
       } else {
-        const paciente = await Paciente.findOne({ email });
+        const paciente = await Paciente.findOne({
+          usuario
+        });
         if (paciente && paciente.password === password) {
           return res.json({
             message: "Paciente logueado",

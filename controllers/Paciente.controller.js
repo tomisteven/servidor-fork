@@ -29,7 +29,7 @@ const getPaciente = async (req, res) => {
 
 const createPaciente = async (req, res) => {
   try {
-    const { dni } = req.body;
+    const { dni, password } = req.body;
     const pacienteExistente = await Paciente.findOne({ dni });
     if (pacienteExistente) {
       return res
@@ -38,7 +38,11 @@ const createPaciente = async (req, res) => {
     }
 
     const paciente = new Paciente(req.body);
-    paciente.password = dni;
+    if (password) {
+      paciente.password = password;
+    } else {
+      paciente.password = dni;
+    }
     await paciente.save();
     res.json({ message: "Paciente creado", paciente, ok: true });
   } catch (error) {

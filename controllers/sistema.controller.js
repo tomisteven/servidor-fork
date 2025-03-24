@@ -4,7 +4,7 @@ const Doctor = require("../models/Doctor");
 
 const login = async (req, res) => {
   try {
-    const { usuario, password } = req.body;
+    const { usuario , password } = req.body;
 
     const secretaria = await Secretaria.findOne({ usuario });
 

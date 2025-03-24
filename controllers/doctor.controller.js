@@ -17,18 +17,18 @@ const getDoctores = async (req, res) => {
 // Crear un nuevo doctor
 const crearDoctor = async (req, res) => {
   try {
-    const { nombre, email, password } = req.body;
-    if (!nombre || !email || !password) {
+    const { usuario, password } = req.body;
+    if (!usuario || !password) {
       return res
         .status(400)
         .json({ ok: false, message: "Todos los campos son obligatorios" });
     }
 
-    const doctorExistente = await Doctor.findOne({ email });
+    const doctorExistente = await Doctor.findOne({ usuario });
     if (doctorExistente) {
       return res
         .status(400)
-        .json({ ok: false, message: "Ya existe un doctor con ese email" });
+        .json({ ok: false, message: "Ya existe un doctor con ese USUARIO" });
     }
 
     const doctor = new Doctor(req.body);
